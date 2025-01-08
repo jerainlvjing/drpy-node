@@ -2,7 +2,7 @@ name: Sync Fork
 
 on:
   schedule:
-    - cron: "58 16 * * *" # 每天23点运行一次
+    - cron: "11 17 * * *" # 每天23点运行一次
     - cron: "0 02 * * *" # 每天02点运行一次
   workflow_dispatch: # 允许手动触发
 
@@ -15,7 +15,7 @@ jobs:
       uses: actions/checkout@v2
       with:
         repository: jerainlvjing/drpy-node
-        token: ${{ secrets.GITHUB_TOKEN }}
+        token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
         fetch-depth: 0
 
     - name: Set up Git config
