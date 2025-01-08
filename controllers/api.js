@@ -25,6 +25,7 @@ export default (fastify, options, done) => {
             // 根据请求方法选择参数来源
             const query = method === 'GET' ? request.query : request.body;
             const moduleExt = query.extend || '';
+            // console.log('moduleExt:', typeof moduleExt, moduleExt);
             const protocol = request.protocol;
             const hostname = request.hostname;
             // const proxyUrl = `${protocol}://${hostname}${request.url}`.split('?')[0].replace('/api/', '/proxy/') + '/?do=js';
@@ -45,7 +46,16 @@ export default (fastify, options, done) => {
                     return proxyUrl
                 };
                 return {
-                    proxyUrl, publicUrl, jsonUrl, httpUrl, mediaProxyUrl, hostUrl, fServer, getProxyUrl, ext: moduleExt
+                    proxyUrl,
+                    publicUrl,
+                    jsonUrl,
+                    httpUrl,
+                    mediaProxyUrl,
+                    hostUrl,
+                    hostname,
+                    fServer,
+                    getProxyUrl,
+                    ext: moduleExt
                 }
             }
 
@@ -212,6 +222,7 @@ export default (fastify, options, done) => {
                 httpUrl,
                 mediaProxyUrl,
                 hostUrl,
+                hostname,
                 fServer,
                 getProxyUrl,
                 ext: moduleExt
@@ -310,7 +321,16 @@ export default (fastify, options, done) => {
                 return proxyUrl
             };
             return {
-                proxyUrl, publicUrl, jsonUrl, httpUrl, mediaProxyUrl, hostUrl, getProxyUrl, fServer, ext: moduleExt
+                proxyUrl,
+                publicUrl,
+                jsonUrl,
+                httpUrl,
+                mediaProxyUrl,
+                hostUrl,
+                hostname,
+                getProxyUrl,
+                fServer,
+                ext: moduleExt
             }
         }
 

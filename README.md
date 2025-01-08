@@ -1,7 +1,7 @@
 # drpyS(drpy-node)
 
 nodejs作为服务端的drpy实现。全面升级异步写法  
-积极开发中，每日一更，当前进度 `26%`
+积极开发中，每日一更，当前进度 `30%`
 
 * [本地配置接口-动态本地](/config?pwd=)
 * [本地配置接口-动态外网/局域网](/config/1?pwd=)
@@ -16,13 +16,20 @@ nodejs作为服务端的drpy实现。全面升级异步写法
 
 ## 更新记录
 
-### 20250104
+### 20250108
 
-更新至V1.1.0
+更新至V1.1.4
 
-1. 支持采王
+1. 更新文档
+2. 修复bug
+3. 增加 `batchExecute`
 
 [点此查看完整更新记录](docs/updateRecord.md)
+
+**注意事项**
+
+总是有人遇到各种奇葩问题，像什么没弹幕，访问/config/1服务马上崩溃等等，能自行解决最好，解决不了我建议你使用下方安装教程 `3.道长腾讯轻量云服务器安装方案`
+跟我一样还有问题那就不可能了，我能用你即能用
 
 ## 基础框架
 
@@ -36,7 +43,7 @@ todo:
 
 精简去除的库:
 
-1. axios
+1. axios(这个去不掉，刚需，后端请求才能拿到set-cookie)
 2. jsonpath
 3. underscore
 4. pino-pretty
@@ -69,7 +76,7 @@ todo:
 
 * 添加定时方案
 
-`echo "30 7 * * * bash -c \"\$(curl -fsSLk https://git-proxy.playdreamer.cn/hjdhnx/drpy-node/raw/refs/heads/main/autorun.sh)\"" >> /path/logfile.log 2>&1" | crontab -`
+`echo "30 7 * * * cd /patch && bash -c \"\$(curl -fsSLk https://git-proxy.playdreamer.cn/hjdhnx/drpy-node/raw/refs/heads/main/autorun.sh)\" >> /patch/drpyslog.log 2>&1" | crontab -`
 
 或者下载脚本到本地后
 
@@ -78,3 +85,50 @@ todo:
 `echo "30 7 * * * bash /path/autorun.sh  >> /path/logfile.log 2>&1" | crontab -`
 
 命令说明 /patch 为脚本存放路径（脚本放在与源码同级的自定义目录中）
+
+3.道长腾讯轻量云服务器安装方案
+
+```shell
+mkdir /home/node_work
+cd /home/node_work
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
+source ~/.bashrc
+nvm install 22
+npm config set registry https://registry.npmmirror.com
+npm i -g cnpm --registry=https://registry.npmmirror.com
+npm i -g pm2 yarn@1.22.19
+git clone https://git-proxy.playdreamer.cn/hjdhnx/drpy-node.git
+cd drpy-node
+yarn
+yarn pm2
+pm2 logs drpys
+pm2 ls
+pm2 stop drpys
+pm2 start drpys
+pm2 restart drpys
+```
+
+## 代理转发功能测试
+
+* [代理转发ds](/req/https://github.com/hjdhnx/drpy-node)
+* [代理转发百度](/req/https://www.baidu.com)
+* [代理转发范冰冰直播源](/req/https://live.fanmingming.com/tv/m3u/ipv6.m3u)
+
+## 友链(白嫖接口服务)
+
+* [猫影视git文件加速](https://github.catvod.com/)
+* [猫影视多功能主页](https://catvod.com/)
+
+## 版权
+
+本项目主体框架由道长开发，项目内相关源收集于互联网，可供学习交流测试使用，禁止商用或者直接转卖代码，转载代码请带上出处。
+
+## 免责声明
+
+1. 此程序仅用于学习研究，不保证其合法性、准确性、有效性，请根据情况自行判断，本人对此不承担任何保证责任。
+2. 由于此程序仅用于学习研究，您必须在下载后 24 小时内将所有内容从您的计算机或手机或任何存储设备中完全删除，若违反规定引起任何事件本人对此均不负责。
+3. 请勿将此程序用于任何商业或非法目的，若违反规定请自行对此负责。
+4. 此程序涉及应用与本人无关，本人对因此引起的任何隐私泄漏或其他后果不承担任何责任。
+5. 本人对任何程序引发的问题概不负责，包括但不限于由程序错误引起的任何损失和损害。
+6. 如果任何单位或个人认为此程序可能涉嫌侵犯其权利，应及时通知并提供身份证明，所有权证明，我们将在收到认证文件确认后删除此程序。
+7. 所有直接或间接使用、查看此程序的人均应该仔细阅读此声明。本人保留随时更改或补充此声明的权利。一旦您使用或复制了此程序，即视为您已接受此免责声明。
