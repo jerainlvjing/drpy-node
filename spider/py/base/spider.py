@@ -92,7 +92,7 @@ class BaseSpider(metaclass=ABCMeta):  # 元类 默认的元类 type
         pass
 
     @abstractmethod
-    def playerContent(self, flag, id, vipFlags):
+    def playerContent(self, flag, id, vipFlags=None):
         pass
 
     @abstractmethod
@@ -114,14 +114,14 @@ class BaseSpider(metaclass=ABCMeta):  # 元类 默认的元类 type
     def init_api_ext_file(self):
         pass
 
-    def getProxyUrl(self):
+    def getProxyUrl(self, flag=False):
         """
         获取本地代理地址
         @return:
         """
         if self.ENV.lower() == 't3':
             # return getProxy(True)
-            return PyUtil.getProxy(False)
+            return PyUtil.getProxy(flag)
             # return 'http://127.0.0.1:9978/proxy?do=py'
         elif self.ENV.lower() == 't4':
             return self.t4_api
@@ -203,26 +203,30 @@ class BaseSpider(metaclass=ABCMeta):  # 元类 默认的元类 type
                        src)
         return clean
 
-    def fetch(self, url, params=None, headers=None, cookies=None, timeout=5, verify=True, allow_redirects=True):
-        rsp = requests.get(url, params=params, headers=headers, cookies=cookies, timeout=timeout, verify=verify,
-                           allow_redirects=allow_redirects)
+    def fetch(self, url, params=None, headers=None, cookies=None, timeout=5, verify=True,
+              allow_redirects=True, stream=None):
+        rsp = requests.get(url, params=params, headers=headers, cookies=cookies, timeout=timeout,
+                           verify=verify,
+                           allow_redirects=allow_redirects, stream=stream)
         rsp.encoding = 'utf-8'
         return rsp
 
-    def post(self, url, data, headers=None, cookies=None, timeout=5, verify=True, allow_redirects=True):
+    def post(self, url, data=None, headers=None, cookies=None, timeout=5, verify=True, allow_redirects=True,
+             stream=None):
         rsp = requests.post(url, data=data, headers=headers, cookies=cookies, timeout=timeout, verify=verify,
-                            allow_redirects=allow_redirects)
+                            allow_redirects=allow_redirects, stream=stream)
         rsp.encoding = 'utf-8'
         return rsp
 
-    def postJson(self, url, json, headers=None, cookies=None, timeout=5, verify=True, allow_redirects=True):
+    def postJson(self, url, json, headers=None, cookies=None, timeout=5, verify=True, allow_redirects=True,
+                 stream=None):
         rsp = requests.post(url, json=json, headers=headers, cookies=cookies, timeout=timeout, verify=verify,
-                            allow_redirects=allow_redirects)
+                            allow_redirects=allow_redirects, stream=stream)
         rsp.encoding = 'utf-8'
         return rsp
 
     def postBinary(self, url, data: dict, boundary=None, headers=None, cookies=None, timeout=5, verify=True,
-                   allow_redirects=True):
+                   allow_redirects=True, stream=None):
         if boundary is None:
             boundary = f'--dio-boundary-{int(time.time())}'
         if headers is None:
@@ -234,7 +238,7 @@ class BaseSpider(metaclass=ABCMeta):  # 元类 默认的元类 type
         m = encode_multipart_formdata(fields, boundary=boundary)
         data = m[0]
         rsp = requests.post(url, data=data, headers=headers, cookies=cookies, timeout=timeout, verify=verify,
-                            allow_redirects=allow_redirects)
+                            allow_redirects=allow_redirects, stream=stream)
         rsp.encoding = 'utf-8'
         return rsp
 

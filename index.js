@@ -4,7 +4,7 @@ import os from 'os';
 import qs from 'qs';
 import {fileURLToPath} from 'url';
 import formBody from '@fastify/formbody';
-import {validateBasicAuth, validateJs, validatePwd} from "./utils/api_validate.js";
+import {validateBasicAuth, validateJs, validatePwd, validatHtml} from "./utils/api_validate.js";
 import {startAllPlugins} from "./utils/pluginManager.js";
 // 注册自定义import钩子
 import './utils/esm-register.mjs';
@@ -18,8 +18,10 @@ const {fastify} = fastlogger;
 // 获取当前路径
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = 5757;
-const MAX_TEXT_SIZE = 0.1 * 1024 * 1024; // 设置最大文本大小为 0.1 MB
+const MAX_TEXT_SIZE = process.env.MAX_TEXT_SIZE || 0.1 * 1024 * 1024; // 设置最大文本大小为 0.1 MB
+const MAX_IMAGE_SIZE = process.env.MAX_IMAGE_SIZE || 0.5 * 1024 * 1024; // 设置最大图片大小为 500 KB
 // 定义options的目录
+const rootDir = __dirname;
 const docsDir = path.join(__dirname, 'docs');
 const jxDir = path.join(__dirname, 'jx');
 const publicDir = path.join(__dirname, 'public');
@@ -31,7 +33,6 @@ const pyDir = path.join(__dirname, 'spider/py');
 const catDir = path.join(__dirname, 'spider/catvod');
 const catLibDir = path.join(__dirname, 'spider/catLib');
 const xbpqDir = path.join(__dirname, 'spider/xbpq');
-const viewsDir = path.join(__dirname, 'views');
 const configDir = path.join(__dirname, 'config');
 
 const pluginProcs = startAllPlugins(__dirname);
@@ -68,7 +69,14 @@ fastify.addHook('onClose', async () => {
 // 给静态目录插件中心挂载basic验证
 fastify.addHook('preHandler', (req, reply, done) => {
     if (req.raw.url.startsWith('/apps/')) {
-        validateBasicAuth(req, reply, done);
+        if (req.raw.url.includes('clipboard-pusher/index.html')) {
+            validateBasicAuth(req, reply, async () => {
+                validatHtml(req, reply, rootDir).then(() => done());
+            });
+        } else {
+            validateBasicAuth(req, reply, done);
+        }
+
     } else if (req.raw.url.startsWith('/js/') || req.raw.url.startsWith('/py/')) {
         validatePwd(req, reply, done).then(async () => {
             validateJs(req, reply, dr2Dir).then(() => done());
@@ -151,7 +159,7 @@ process.on('exit', async (code) => {
 });
 
 registerRoutes(fastify, {
-    rootDir: __dirname,
+    rootDir,
     docsDir,
     jxDir,
     publicDir,
@@ -165,7 +173,7 @@ registerRoutes(fastify, {
     xbpqDir,
     PORT,
     MAX_TEXT_SIZE,
-    viewsDir,
+    MAX_IMAGE_SIZE,
     configDir,
     indexFilePath: path.join(__dirname, 'index.json'),
     customFilePath: path.join(__dirname, 'custom.json'),

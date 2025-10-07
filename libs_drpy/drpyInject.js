@@ -1,9 +1,7 @@
 import axios, {toFormData} from 'axios';
 import axiosX from './axios.min.js';
-import {createInstance} from './fetchAxios.js';
+import {createHttpsInstance, httpsAgent} from './fetchAxios.js';
 import crypto from 'crypto';
-import http from "http";
-import https from 'https';
 import fs from 'fs';
 import qs from 'qs';
 import _ from './underscore-esm.min.js'
@@ -18,6 +16,7 @@ import {ENV} from '../utils/env.js';
 
 // import {batchFetch1, batchFetch2, batchFetch3} from './drpyBatchFetch.js';
 import {batchFetch3} from './hikerBatchFetch.js';
+import createAxiosInstance from "../utils/createAxiosAgent.js";
 
 globalThis.batchFetch = batchFetch3;
 globalThis.axios = axios;
@@ -25,33 +24,23 @@ globalThis.axiosX = axiosX;
 globalThis.hlsParser = hlsParser;
 globalThis.qs = qs;
 
-const AgentOption = {keepAlive: true, maxSockets: 64, timeout: 30000}; // 最大连接数64,30秒定期清理空闲连接
-const httpAgent = new http.Agent(AgentOption);
-let httpsAgent = new https.Agent({rejectUnauthorized: false, ...AgentOption});
+const maxSockets = 64;
+const _axios = createAxiosInstance({maxSockets: maxSockets});
+let $axios;
 const dsReqLib = Number(process.env.DS_REQ_LIB) || 0;
-console.log('DS/CAT源底层req实现 DS_REQ_LIB (0 fetch 1 axios):', dsReqLib);
-let _axios;
+console.log('[drpyInject]DS/CAT源底层req实现 DS_REQ_LIB (0 fetch 1 axios):', dsReqLib);
 // 配置 axios 使用代理
 
 if (dsReqLib === 0) {
-    _axios = createInstance({
-        headers: {'User-Agent': 'Mozilla/5.0'},
-        timeout: 10000,
-        responseType: 'text',
-        httpsAgent: new https.Agent({rejectUnauthorized: false}), // 忽略 HTTPS 证书错误
-    });
-
-// 请求拦截器
-    _axios.useRequestInterceptor(RequestInterceptor, (error) => {
+    $axios = createHttpsInstance();
+    // 请求拦截器
+    $axios.useRequestInterceptor(RequestInterceptor, (error) => {
         return Promise.reject(error);
     });
 } else {
-    _axios = axios.create({
-        httpAgent,  // 用于 HTTP 请求的代理
-        httpsAgent, // 用于 HTTPS 请求的代理
-    });
+    $axios = _axios;
     // 请求拦截器
-    _axios.interceptors.request.use(RequestInterceptor, (error) => {
+    $axios.interceptors.request.use(RequestInterceptor, (error) => {
         return Promise.reject(error);
     });
 }
@@ -170,10 +159,32 @@ async function request(url, opt = {}) {
     }
 
     // 根据 postType 处理数据
-    if (postType === 'form' && data != null) {
+    // 如果没有明确指定 postType，尝试从 Content-Type 推断
+    let effectivePostType = postType;
+    if (!effectivePostType) {
+        // 查找不区分大小写的 Content-Type 头
+        const contentTypeKey = Object.keys(headers).find(key => 
+            key.toLowerCase() === 'content-type'
+        );
+        
+        if (contentTypeKey && headers[contentTypeKey]) {
+            const contentType = headers[contentTypeKey].toLowerCase();
+            if (contentType.includes('application/x-www-form-urlencoded')) {
+                effectivePostType = 'form';
+            } else if (contentType.includes('multipart/form-data')) {
+                effectivePostType = 'form-data';
+            }
+        }
+    }
+    
+    // 根据有效的 postType 处理数据
+    if (effectivePostType === 'form' && data != null) {
         data = qs.stringify(data, {encode: false});
-    } else if (postType === 'form-data') {
+    } else if (effectivePostType === 'form-data' && data != null) {
         data = toFormData(data);
+    }
+    if (data) {
+        console.log(`[req] postType:${effectivePostType},data:`, data);
     }
 
     // 配置代理或 HTTPS Agent
@@ -184,11 +195,11 @@ async function request(url, opt = {}) {
     const respType = returnBuffer ? 'arraybuffer' : 'arraybuffer';
 
     if (ENV.get('show_req', '0') === '1') {
-        console.log(`req: ${url} headers: ${JSON.stringify(headers)} data: ${JSON.stringify(data)}`);
+        console.log(`req[${method}]: ${url} headers: ${JSON.stringify(headers)} data: ${JSON.stringify(data)}`);
     }
     try {
         // 发送请求
-        const resp = await _axios({
+        const resp = await $axios({
             url: typeof url === 'object' ? url.url : url,
             method,
             headers,
@@ -237,7 +248,7 @@ async function request(url, opt = {}) {
         return {code: resp.status, headers: resHeader, content: responseData};
     } catch (error) {
         const {response: resp} = error;
-        console.error(`Request error: ${error.message}`);
+        console.error(`[request] Request error: ${error.message}`);
         let responseData = '';
         // console.log('responseData:',responseData);
         try {
@@ -249,7 +260,7 @@ async function request(url, opt = {}) {
                 responseData = buffer.toString('utf-8');
             }
         } catch (e) {
-            console.error(`get error response Text failed: ${e.message}`);
+            console.error(`[request] get error response Text failed: ${e.message}`);
         }
         // console.log('responseData:',responseData);
         return {
@@ -317,7 +328,7 @@ function aes(mode, encrypt, input, inBase64, key, iv, outBase64) {
         const outBuf = Buffer.concat([cipher.update(inBuf), cipher.final()]);
         return outBase64 ? base64EncodeBuf(outBuf) : outBuf.toString('utf8');
     } catch (error) {
-        console.log(error);
+        console.log('[aes]', error);
     }
     return '';
 }
@@ -344,7 +355,7 @@ function des(mode, encrypt, input, inBase64, key, iv, outBase64) {
         const outBuf = Buffer.concat([cipher.update(inBuf), cipher.final()]);
         return outBase64 ? base64EncodeBuf(outBuf) : outBuf.toString('utf8');
     } catch (error) {
-        console.log(error);
+        console.log('[des]', error);
     }
     return '';
 }
@@ -398,7 +409,7 @@ function rsa(mode, pub, encrypt, input, inBase64, key, outBase64) {
         }
         return outBase64 ? base64EncodeBuf(outBuf) : outBuf.toString('utf8');
     } catch (error) {
-        console.log(error);
+        console.log('[rsa]', error);
     }
     return '';
 }

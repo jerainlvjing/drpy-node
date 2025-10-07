@@ -1,52 +1,99 @@
 # drpyS(drpy-node)
 
 nodejs作为服务端的drpy实现。全面升级异步写法  
-~~积极开发中，每日一更~~，当前进度 `89%`  
+~~积极开发中，每日一更~~，当前进度 `99.99999%`  
 ~~找工作中，随缘更新~~  
 上班当牛马，下班要带娃，阶段性佛系趁娃睡觉熬夜更新
 
+### 常用超链接
+
+* [本项目主页-免翻](https://git-proxy.playdreamer.cn/hjdhnx/drpy-node)
 * [接口文档](docs/apidoc.md) | [接口列表如定时任务](docs/apiList.md) | [小猫影视-待对接T4](https://github.com/waifu-project/movie/pull/135)
-* [本地配置接口-动态本地](/config?pwd=$pwd)
-* [本地配置接口-动态外网/局域网](/config/1?pwd=$pwd)
+* [代码质量评估工具说明](docs/codeCheck.md) | [DS项目代码评估报告](docs/codeCheckReport.md)
+* [本地配置接口-动态本地](/config?healthy=1&pwd=$pwd)
+* [本地配置接口-动态外网/局域网](/config/1?healthy=1&pwd=$pwd)
 * [其他配置接口-订阅过滤](/docs/sub.md)
 * [python环境](/docs/pyenv.md) | [DS项目环境变量说明](/docs/envdoc.md)
 * [猫源调试教程](/docs/catDebug.md)
-* [代码加解密工具](/admin/encoder)
-* [V我50支付凭证生成器](/authcoder?len=10&number=1)
 * [接口压测教程](/docs/httpTest.md)
-* [央视点播解析工具](/proxy/央视大全[官]/index.html)
+* [AI编程工具 trae](https://www.trae.ai/account-setting#subscription) | 邮编ZIP输入: 518000
+* [免费AI-360纳米](https://bot.n.cn/)|[免费AI-当贝AI](https://ai.dangbei.com/chat)
+* [本站防止爬虫协议](/robots.txt)
+* [油猴脚本-反切屏检测](/public/monkey/check_screen_leave.user.js)
+* [油猴脚本-通用网页脚本框架](/public/monkey/clipboard-sender.user.js)
+* [油猴脚本-通用网页脚本框架自定义指令集](/public/monkey/自定义指令集-道长.json)
+
+-------------------------
+
+### 插件应用列表
+
 * [cookie管理插件](/apps/cookie-butler/index.html)
 * [cron表达式插件](/apps/cron-generator/index.html)
-* [本站防止爬虫协议](/robots.txt)
-* [本项目主页-免翻](https://git-proxy.playdreamer.cn/hjdhnx/drpy-node)
+* [剪切板智能推送插件](/apps/clipboard-pusher/index.html)
+* [DS源可用性检测插件](/apps/source-checker/index.html)
+* [DS解析检测插件](/apps/vip-parser/index.html)
+* [DS源配置编辑插件](/apps/source-editor/index.html)
+* [DS内存图片管理器插件](/apps/image-manager/index.html)
+* [DS时钟插件-白色时钟](/apps/clock/white_clock.html)|[日历时钟](/apps/clock/index.html)
+* [DS庆祝页面-完结撒花](/apps/happy/index.html)
+* [DrPlayer](/apps/drplayer)
+* [代码加解密工具](/admin/encoder)
+* [央视点播解析工具](/proxy/央视大全[官]/index.html)
+* [在线猫ds源主页](/cat/index.html)
+* [V我50支付凭证生成器](/authcoder?len=10&number=1)
+
+### 同作者项目
+
 * [DS源适配猫影视](https://github.com/hjdhnx/CatPawOpen/tree/ds-cat)
 * [DS插件项目-golang](https://github.com/hjdhnx/drpy-plugin)
+* [DS 二进制插件项目-pup-sniffer](https://github.com/hjdhnx/pup-sniffer)
+* [DS web插件项目-drplayer](https://github.com/hjdhnx/DrPlayer)
 * [drpy2打包项目](https://github.com/hjdhnx/drpy-webpack)
-* [在线猫ds源主页](/cat/index.html)
 
 ## 更新记录
 
-### 20250901
+### 20251007
 
-更新至V1.2.22
+更新至V1.3.7
 
-### 20250829
+### 20250927
 
-更新至V1.2.21
+更新至V1.3.6
 
-### 20250825
+### 20250925
 
-更新至V1.2.20
+更新至V1.3.5
 
-### 20250824
+### 20250919
 
-更新至V1.2.19
+更新至V1.3.4
 
-### 20250823
+### 20250918
 
-更新至V1.2.18
+更新至V1.3.3
 
-### 20250822
+### 20250916
+
+更新至V1.3.2
+
+### 20250914
+
+更新至V1.3.1
+
+框架已完成，预留0.1%进度修bug
+
+### 20250913
+
+更新至V1.2.30
+
+### 20250911
+
+更新至V1.2.29
+完美dr2模板源适配
+
+### 20250910
+
+更新至V1.2.28
 
 [点此查看完整更新记录](docs/updateRecord.md)
 
@@ -77,6 +124,7 @@ todo:
 ## 参考资料
 
 * [crypto-js-wasm使用教程](docs/crypto-js-wasm/readme-CN.md)
+* [webdav使用教程](docs/webdav.md)
 * [puppeteer使用教程](docs/pupInstall.md)
 * [drpyS源属性说明](docs/ruleAttr.md)
 * [drpy2写源简述](docs/ruleDesc.md)
@@ -145,7 +193,8 @@ pm2 restart drpys
 * [猫影视git文件加速](https://github.catvod.com/)
 * [猫影视多功能主页](https://catvod.com/)
 * [ZY写源教学](https://zy.catni.cn/editSource/edit-grammar.html)
-* [源动力](https://sourcepower.top/index)
+* [源动力-新](https://tvshare.cn/)
+* [源动力-老](https://sourcepower.top/index)
 
 ## AI接入
 
